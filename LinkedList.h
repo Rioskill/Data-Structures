@@ -16,21 +16,18 @@ public:
     void setNext(LinkedListNode *next){this->next = next;}
     void setPrev(LinkedListNode *prev){this->prev = prev;}
 
-    LinkedListNode &operator+(int n);
-};
-
-template <typename T>
-LinkedListNode<T> &LinkedListNode<T>::operator+(int n)
-{
-    auto res = this;
-    for(int i = 0; i < n; i++)
+    LinkedListNode &operator+(int n)
     {
-        if(res == nullptr)
-            break;
-        res = res->getNext();
+        auto res = this;
+        for(int i = 0; i < n; i++)
+        {
+            if(res == nullptr)
+                break;
+            res = res->getNext();
+        }
+        return *res;
     }
-    return *res;
-}
+};
 
 template <class T>
 class LinkedList
@@ -49,7 +46,7 @@ public:
 
     LinkedListNode<T> *getHead()
     {
-        return *this->head;
+        return this->head;
     }
     LinkedListNode<T> *getTail()
     {
@@ -60,7 +57,6 @@ public:
 template <typename T>
 LinkedList<T>::LinkedList()
 {
-    this->current = nullptr;
     this->head = nullptr;
     this->tail = nullptr;
 }

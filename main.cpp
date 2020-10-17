@@ -1,35 +1,21 @@
 #include <iostream>
-#include "BinaryTree.h"
-
-template <typename T>
-void print(std::vector<T> arr)
-{
-    for(auto &i: arr)
-        std::cout << i << ' ';
-    std::cout << std::endl;
-}
-
-template <typename T>
-void print(BinaryTree<T> &tree){print(tree.getInOrderTraversal());}
+#include "LinkedList.h"
 
 int main()
 {
-    BinaryTree<char> tree;
+    LinkedList<int> list;
 
-    tree.add('c');
-    tree.add('e');
-    tree.add('a');
-    tree.add('d');
+    list.push_head(3);
+    list.push_head(2);
+    list.push_head(5);
+    list.push_tail(1);
 
-    print(tree);
+    for(auto it = list.getTail(); it != nullptr; it = it->getNext())
+    {
+        std::cout << it->getData() << ' ';
+    }
 
-    std::cout << tree.getHeight() << std::endl;
-
-    tree.remove('c');
-
-    print(tree);
-
-    std::cout << tree.getHeight() << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }

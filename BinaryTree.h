@@ -3,6 +3,36 @@
 
 #include <iostream>
 
+class LinkedListNode
+{
+private:
+    T data;
+    LinkedListNode *prev;
+    LinkedListNode *next;
+public:
+    LinkedListNode(T data, LinkedListNode *prev, LinkedListNode *next): data(data), prev(prev), next(next){}
+    
+    LinkedListNode *getNext(){return this->next;}
+    LinkedListNode *getPrev(){return this->prev;}
+
+    T getData(){return this->data;}
+
+    void setNext(LinkedListNode *next){this->next = next;}
+    void setPrev(LinkedListNode *prev){this->prev = prev;}
+
+    LinkedListNode &operator+(int n)
+    {
+        auto res = this;
+        for(int i = 0; i < n; i++)
+        {
+            if(res == nullptr)
+                break;
+            res = res->getNext();
+        }
+        return *res;
+    }
+};
+
 template <typename T>
 class BinaryTree
 {
