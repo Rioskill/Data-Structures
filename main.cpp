@@ -1,21 +1,15 @@
 #include <iostream>
-#include "LinkedList.h"
+#include "SeparateChainingHashTable.h"
 
 int main()
 {
-    LinkedList<int> list;
+    SeparateChainingHashTable<std::string, int> table(10);
 
-    list.push_head(3);
-    list.push_head(2);
-    list.push_head(5);
-    list.push_tail(1);
+    table["kek"] = 5;
 
-    for(auto it = list.getTail(); it != nullptr; it = it->getNext())
-    {
-        std::cout << it->getData() << ' ';
-    }
+    table.get("kek") = 98;
 
-    std::cout << std::endl;
+    std::cout << table.get("kek") << std::endl;
 
     return 0;
 }

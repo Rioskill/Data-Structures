@@ -1,3 +1,5 @@
+#include <functional>
+
 template <class T>
 class LinkedListNode
 {
@@ -11,7 +13,7 @@ public:
     LinkedListNode *getNext(){return this->next;}
     LinkedListNode *getPrev(){return this->prev;}
 
-    T getData(){return this->data;}
+    T &getData(){return this->data;}
 
     void setNext(LinkedListNode *next){this->next = next;}
     void setPrev(LinkedListNode *prev){this->prev = prev;}
@@ -41,8 +43,14 @@ public:
     LinkedList();
     ~LinkedList();
 
+    bool is_empty();
+    bool contains(const T &value);
+    bool contains(std::function<bool(T)> function);
+
     void push_tail(const T &data);
     void push_head(const T &data);
+
+    T &find(std::function<bool(T)> function);
 
     LinkedListNode<T> *getHead()
     {
@@ -53,6 +61,14 @@ public:
         return this->tail;
     }
 };
+
+template <typename T>
+T &LinkedList<T>::find(std::function<bool(T)> function)
+{
+    for(auto it = getTail(); it != nullptr; it = it->getNext())
+        if(function(it->getData()))
+            return it->getData();
+}
 
 template <typename T>
 LinkedList<T>::LinkedList()
@@ -68,8 +84,38 @@ LinkedList<T>::~LinkedList()
     while(iter_node != this->head)
     {
         iter_node = iter_node->getNext();
+
         delete iter_node->getPrev();
     }
+    delete iter_node;
+}
+
+template <typename T>
+bool LinkedList<T>::is_empty()
+{
+    return this->head == nullptr;
+}
+
+template <typename T>
+bool LinkedList<T>::contains(const T &value)
+{
+    for(auto it = getTail(); it != nullptr; it = it->getNext())
+    {
+        if(it->getData() == value)
+            return true;
+    }
+    return false;
+}
+
+template <typename T>
+bool LinkedList<T>::contains(std::function<bool(T)> func)
+{
+    for(auto it = getTail(); it != nullptr; it = it->getNext())
+    {
+        if(func(it->getData()))
+            return true;
+    }
+    return false;
 }
 
 template <typename T>
