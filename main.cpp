@@ -5,11 +5,17 @@ int main()
 {
     SeparateChainingHashTable<std::string, int> table(10);
 
-    table["kek"] = 5;
+    table["one"] = 1;
+    table["two"] = 2;
+    table["three"] = 3;
 
-    table.get("kek") = 98;
+    std::cout << table.getCapacity() << ' ' << table << std::endl;
 
-    std::cout << table.get("kek") << std::endl;
+    table.resize(25);
+
+    table.get("four") = 4;
+
+    std::cout << table.getCapacity() << ' ' << table << std::endl;
 
     return 0;
 }

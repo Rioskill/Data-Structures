@@ -43,12 +43,16 @@ public:
     LinkedList();
     ~LinkedList();
 
+    LinkedList(const LinkedList &list);
+
     bool is_empty();
     bool contains(const T &value);
     bool contains(std::function<bool(T)> function);
 
     void push_tail(const T &data);
     void push_head(const T &data);
+
+    LinkedList &operator=(const LinkedList &list);
 
     T &find(std::function<bool(T)> function);
 
@@ -75,6 +79,25 @@ LinkedList<T>::LinkedList()
 {
     this->head = nullptr;
     this->tail = nullptr;
+}
+
+template <typename T>
+LinkedList<T>::LinkedList(const LinkedList &list)
+{
+    for(auto it = list.getTail(); it != nullptr; it = it->getNext())
+    {
+        this.pushHead(it->getData());
+    }
+}
+
+template <typename T>
+LinkedList<T> &LinkedList<T>::operator=(const LinkedList &list)
+{
+    for(auto it = list.getTail(); it != nullptr; it = it->getNext())
+    {
+        this.pushHead(it->getData());
+    }
+    return this;
 }
 
 template <typename T>
@@ -151,4 +174,3 @@ void LinkedList<T>::push_head(const T &data)
         this->head = node;
     }
 }
-

@@ -39,8 +39,6 @@ public:
 
     void setKey(KeyT &key){this->key = key;};
     void setValue(ValueT &value){this->value = value;};
-
-    unsigned long size(){return this->size;}
 };
 
 template <typename KeyT, typename ValueT>
@@ -70,10 +68,16 @@ public:
     SeparateChainingHashTable(unsigned int capacity);
     ~SeparateChainingHashTable();
 
-    bool exists(const KeyT &key);
+    bool contains(const KeyT &key);
 
     ValueT &get(const KeyT &key);
     ValueT &operator[](const KeyT &key){return this->get(key);}
+
+    unsigned long getCapacity(){return this->capacity;}
+    void resize(unsigned long new_size);
+
+    template <typename T1, typename T2>
+    friend std::ostream &operator<<(std::ostream &out, const SeparateChainingHashTable<T1, T2> &table);
 };
 
 template <typename KeyT, typename ValueT>
@@ -86,6 +90,34 @@ template <typename KeyT, typename ValueT>
 SeparateChainingHashTable<KeyT, ValueT>::~SeparateChainingHashTable()
 {
     delete[] this->pairs;
+}
+
+template <typename KeyT, typename ValueT>
+void SeparateChainingHashTable<KeyT, ValueT>::resize(unsigned long new_size)
+{
+    LinkedList<Pair<KeyT, ValueT>> *new_pairs = new LinkedList<Pair<KeyT, ValueT>>[new_size];
+
+    
+
+    for(unsigned int i = 0; i < this->capacity; i++)
+    {
+        auto row = &this->pairs[i];
+        if(!row->is_empty())
+        {
+            for(LinkedListNode<Pair<KeyT, ValueT>> *it = row->getTail(); it != nullptr; it = it->getNext())
+            {
+                auto data = it->getData();
+                auto hash = hashing(data.getKey());
+
+                new_pairs[hash % new_size].push_head(data);
+            }
+        }
+    }
+
+    delete[] this->pairs;
+
+    this->capacity = new_size;
+    this->pairs = new_pairs;
 }
 
 template <typename KeyT, typename ValueT>
@@ -103,11 +135,33 @@ ValueT &SeparateChainingHashTable<KeyT, ValueT>::get(const KeyT &key)
 }
 
 template <typename KeyT, typename ValueT>
-bool SeparateChainingHashTable<KeyT, ValueT>::exists(const KeyT &key)
+bool SeparateChainingHashTable<KeyT, ValueT>::contains(const KeyT &key)
 {
     unsigned long hash = hashing(key);
 
     LinkedList<Pair<KeyT, ValueT>> *pair_list = &this->pairs[hash % this->capacity];
 
     return pair_list->contains([key](Pair<KeyT, ValueT> pair){return pair.getKey() == key;});
+}
+
+template <typename KeyT, typename ValueT>
+std::ostream &operator<<(std::ostream &out, const SeparateChainingHashTable<KeyT, ValueT> &table)
+{
+    out << "{";
+    std::string sep = "";
+    for(unsigned int i = 0; i < table.capacity; i++)
+    {
+        auto row = &table.pairs[i];
+        if(!row->is_empty())
+        {
+            for(LinkedListNode<Pair<KeyT, ValueT>> *it = row->getTail(); it != nullptr; it = it->getNext())
+            {
+                out << sep << it->getData().getKey() << ": " << it->getData().getValue();
+                if(sep == "")
+                    sep = ", ";
+            }
+        }
+    }
+    out << "}";
+    return out;
 }
