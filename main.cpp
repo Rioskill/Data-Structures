@@ -1,21 +1,25 @@
 #include <iostream>
-#include "SeparateChainingHashTable.h"
+#include "Heap.h"
+
+struct Person
+{
+    int age;
+    std::string name;
+
+    Person(int age, std::string name): age(age), name(name){};
+
+    int getAge(){return this->age;};
+};
 
 int main()
 {
-    SeparateChainingHashTable<std::string, int> table(10);
+    Heap<Person, int> heap([](Person person){return person.age;});
 
-    table["one"] = 1;
-    table["two"] = 2;
-    table["three"] = 3;
+    heap.insert(Person(5, "Vova"));
 
-    std::cout << table.getCapacity() << ' ' << table << std::endl;
+    heap.insert(Person(53, "Vladimir"));
 
-    table.resize(25);
-
-    table.get("four") = 4;
-
-    std::cout << table.getCapacity() << ' ' << table << std::endl;
+    std::cout << heap.poll().name << ' ' << heap.poll().name << std::endl;
 
     return 0;
 }

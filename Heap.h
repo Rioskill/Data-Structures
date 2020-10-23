@@ -1,14 +1,17 @@
 #include <vector>
+#include <functional>
 
-template <typename T>
+template <typename ObjectT, typename KeyT>
 class Heap
 {
 private:
-    std::vector<T> data;
+    std::vector<ObjectT> data;
+    std::function<KeyT(ObjectT)> getKey;
+
 
     void swap(unsigned int first_id, unsigned int second_id)
     {
-        int t = this->data[first_id];
+        ObjectT t = this->data[first_id];
         this->data[first_id] = this->data[second_id];
         this->data[second_id] = t;
     }
@@ -17,14 +20,14 @@ private:
 
     bool less(unsigned int first_id, unsigned int second_id)
     {
-        return this->data[first_id] < this->data[second_id];
+        return getKey(this->data[first_id]) < getKey(this->data[second_id]);
     }
 
     bool less_than_parent(unsigned int id)
     {
         if(id == 0)
             return false;
-        else return this->data[id] < this->data[get_parent_id(id)];
+        else return less(id, get_parent_id(id));
     }
 
     unsigned int get_left_child_id(unsigned int id){return id * 2 + 1;}
@@ -36,23 +39,34 @@ private:
     void sink(unsigned int id);
 
 public:
-    void insert(T value);
-    T poll();
+    Heap()
+    {
+        this->getKey = [](ObjectT object){return object;};
+    }
+
+    Heap(std::function<KeyT(ObjectT)> function)
+    {
+        this->getKey = function;
+    }
+
+
+    void insert(ObjectT value);
+    ObjectT poll();
 };
 
-template <typename T>
-void Heap<T>::insert(T value)
+template <typename ObjectT, typename KeyT>
+void Heap<ObjectT, KeyT>::insert(ObjectT value)
 {
     this->data.push_back(value);
     swim(this->data.size() - 1);
 }
 
-template <typename T>
-T Heap<T>::poll()
+template <typename ObjectT, typename KeyT>
+ObjectT Heap<ObjectT, KeyT>::poll()
 {
     this->swap(0, this->data.size() - 1);
 
-    int res = this->data[this->data.size() - 1];
+    ObjectT res = this->data[this->data.size() - 1];
     this->data.pop_back();
 
     this->sink(0);
@@ -60,8 +74,8 @@ T Heap<T>::poll()
     return res;
 }
 
-template <typename T>
-void Heap<T>::swim(unsigned int id)
+template <typename ObjectT, typename KeyT>
+void Heap<ObjectT, KeyT>::swim(unsigned int id)
 {
     while(id > 0 && less_than_parent(id))
     {
@@ -70,8 +84,8 @@ void Heap<T>::swim(unsigned int id)
     }
 }
 
-template <typename T>
-void Heap<T>::sink(unsigned int id)
+template <typename ObjectT, typename KeyT>
+void Heap<ObjectT, KeyT>::sink(unsigned int id)
 {
     while(1)
     {
