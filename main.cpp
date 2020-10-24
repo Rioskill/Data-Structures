@@ -1,25 +1,15 @@
 #include <iostream>
 #include "Heap.h"
 
-struct Person
-{
-    int age;
-    std::string name;
-
-    Person(int age, std::string name): age(age), name(name){};
-
-    int getAge(){return this->age;};
-};
-
 int main()
 {
-    Heap<Person, int> heap([](Person person){return person.age;});
+    Heap<int> heap;
 
-    heap.insert(Person(5, "Vova"));
+    heap.insert(1);
+    heap.insert(2);
+    heap.insert(59);
 
-    heap.insert(Person(53, "Vladimir"));
-
-    std::cout << heap.poll().name << ' ' << heap.poll().name << std::endl;
+    std::cout << heap.poll() << ' ' << heap.poll() << ' ' << heap.poll() << std::endl;
 
     return 0;
 }

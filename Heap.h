@@ -1,7 +1,7 @@
 #include <vector>
 #include <functional>
 
-template <typename ObjectT, typename KeyT>
+template <typename ObjectT, typename KeyT=ObjectT>
 class Heap
 {
 private:
