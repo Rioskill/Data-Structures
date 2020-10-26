@@ -1,3 +1,6 @@
+#ifndef SEPARATE_CHAINING_HASH_TABLE_HEADER
+#define SEPARATE_CHAINING_HASH_TABLE_HEADER
+
 #include "LinkedList.h"
 #include <string>
 #include <iostream>
@@ -165,3 +168,5 @@ std::ostream &operator<<(std::ostream &out, const SeparateChainingHashTable<KeyT
     out << "}";
     return out;
 }
+
+#endif

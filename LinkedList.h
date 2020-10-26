@@ -1,3 +1,6 @@
+#ifndef LINKEDLIST_HEADER
+#define LINKEDLIST_HEADER
+
 #include <functional>
 
 template <class T>
@@ -174,3 +177,5 @@ void LinkedList<T>::push_head(const T &data)
         this->head = node;
     }
 }
+
+#endif

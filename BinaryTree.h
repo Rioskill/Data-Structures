@@ -1,3 +1,6 @@
+#ifndef BINARYTREE_HEADER
+#define BINARYTREE_HEADER
+
 #include <functional>
 #include <vector>
 
@@ -316,3 +319,5 @@ std::vector<ObjectT> BinaryTree<ObjectT, KeyT>::getInOrderTraversal()
 
     return res_vector;
 }
+
+#endif

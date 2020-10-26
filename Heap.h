@@ -1,3 +1,6 @@
+#ifndef HEAP_HEADER
+#define HEAP_HEADER
+
 #include <vector>
 #include <functional>
 
@@ -103,3 +106,5 @@ void Heap<ObjectT, KeyT>::sink(unsigned int id)
         id = smallest_id;
     }
 }
+
+#endif
