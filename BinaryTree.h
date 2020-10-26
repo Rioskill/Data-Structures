@@ -3,49 +3,22 @@
 
 #include <iostream>
 
-template <typename T>
-class LinkedListNode
-{
-private:
-    T data;
-    LinkedListNode *prev;
-    LinkedListNode *next;
-public:
-    LinkedListNode(T data, LinkedListNode *prev, LinkedListNode *next): data(data), prev(prev), next(next){}
-    
-    LinkedListNode *getNext(){return this->next;}
-    LinkedListNode *getPrev(){return this->prev;}
-
-    T getData(){return this->data;}
-
-    void setNext(LinkedListNode *next){this->next = next;}
-    void setPrev(LinkedListNode *prev){this->prev = prev;}
-
-    LinkedListNode &operator+(int n)
-    {
-        auto res = this;
-        for(int i = 0; i < n; i++)
-        {
-            if(res == nullptr)
-                break;
-            res = res->getNext();
-        }
-        return *res;
-    }
-};
-
-template <typename T>
+template <typename ObjectT, typename KeyT=ObjectT>
 class BinaryTree
 {
 private:
     class Node
     {
     private:
-        T value;
+        ObjectT value;
         Node *left;
         Node *right;
+
     public:
-        Node(T value): value(value){this->left = this->right = nullptr;}
+        Node(ObjectT value): value(value)
+        {
+            this->left = this->right = nullptr;
+        }
         ~Node()
         {
             delete this->left;
@@ -64,8 +37,10 @@ private:
         void setLeft(Node &node){this->left = &node;}
         void setRight(Node &node){this->right = &node;}
 
-        T getData(){return this->value;}
-        void setData(T value){this->value = value;}
+        ObjectT getData(){return this->value;}
+        void setData(ObjectT value){this->value = value;}
+
+        KeyT getKey(){return this->getKey(this->value);}
 
         void clear_for_removal()
         {
@@ -78,15 +53,17 @@ private:
 
     unsigned int size;
 
-    bool add(Node &node, T value);
+    bool insert(Node &node, ObjectT value);
 
-    Node *remove(Node &node, T value);
+    Node *remove(Node &node, ObjectT value);
     Node &find_min(Node &node);
     void copy(Node &to, Node &from);
 
     unsigned int getHeight(Node &node);
 
-    bool contains(Node &node, T value);
+    bool contains(Node &node, ObjectT value);
+
+    std::function<KeyT(ObjectT &)> getKey;
 public:
     Node &getRoot(){return *this->root;}
 
@@ -94,6 +71,15 @@ public:
     {
         this->root = nullptr;
         this->size = 0;
+
+        this->getKey = [](ObjectT &object){return object;};
+    }
+    BinaryTree(std::function<KeyT(ObjectT &)> getKey)
+    {
+        this->root = nullptr;
+        this->size = 0;
+
+        this->getKey = getKey;
     }
     ~BinaryTree(){delete this->root;}
 
@@ -101,19 +87,19 @@ public:
     unsigned int getHeight();
     bool isEmpty(){return this->getSize() == 0;}
 
-    void add(T value);
-    void remove(T value);
+    void insert(ObjectT value);
+    void remove(ObjectT value);
 
-    bool contains(T value);
+    bool contains(ObjectT value);
 
-    std::vector<T> getInOrderTraversal();
+    std::vector<ObjectT> getInOrderTraversal();
 
 };
 
 unsigned int max(unsigned int first, unsigned int second){return first > second ? first: second;}
 
-template <typename T>
-unsigned int BinaryTree<T>::getHeight(Node &node)
+template <typename ObjectT, typename KeyT>
+unsigned int BinaryTree<ObjectT, KeyT>::getHeight(Node &node)
 {
     if(node.hasLeftChild() && node.hasRightChild())
         return max(getHeight(node.getLeft()), getHeight(node.getRight())) + 1;
@@ -127,20 +113,20 @@ unsigned int BinaryTree<T>::getHeight(Node &node)
     else return 1;
 }
 
-template <typename T>
-unsigned int BinaryTree<T>::getHeight()
+template <typename ObjectT, typename KeyT>
+unsigned int BinaryTree<ObjectT, KeyT>::getHeight()
 {
     return getHeight(getRoot());
 }
 
-template<typename T>
-bool BinaryTree<T>::contains(Node &node, T value)
+template<typename ObjectT, typename KeyT>
+bool BinaryTree<ObjectT, KeyT>::contains(Node &node, ObjectT value)
 {
-    T data = node.getData();
+    ObjectT data = node.getData();
     if(value == data)
         return true;
     
-    if(value < data)
+    if(getKey(value) < getKey(data))
         if(node.hasLeftChild())
             return contains(node.getLeft(), value);
         else return false;
@@ -151,14 +137,14 @@ bool BinaryTree<T>::contains(Node &node, T value)
         else return false;
 }
 
-template <typename T>
-bool BinaryTree<T>::contains(T value)
+template <typename ObjectT, typename KeyT>
+bool BinaryTree<ObjectT, KeyT>::contains(ObjectT value)
 {
     return contains(getRoot(), value);
 }
 
-template <typename T>
-void BinaryTree<T>::copy(Node &to, Node &from)
+template <typename ObjectT, typename KeyT>
+void BinaryTree<ObjectT, KeyT>::copy(Node &to, Node &from)
 {
     to.setData(from.getData());
 
@@ -171,8 +157,8 @@ void BinaryTree<T>::copy(Node &to, Node &from)
     else to.setRight(nullptr);
 }
 
-template <typename T>
-typename BinaryTree<T>::Node &BinaryTree<T>::find_min(Node &node)
+template <typename ObjectT, typename KeyT>
+typename BinaryTree<ObjectT, KeyT>::Node &BinaryTree<ObjectT, KeyT>::find_min(Node &node)
 {
     Node *ptr = &node;
 
@@ -181,23 +167,24 @@ typename BinaryTree<T>::Node &BinaryTree<T>::find_min(Node &node)
     return *ptr;
 }
 
-template <typename T>
-bool BinaryTree<T>::add(Node &node, T value)
+template <typename ObjectT, typename KeyT>
+bool BinaryTree<ObjectT, KeyT>::insert(Node &node, ObjectT value)
 {
-    if(value < node.getData())
+    ObjectT data = node.getData();
+    if(getKey(value) < getKey(data))
     {
         if(node.hasLeftChild())
-            return this->add(node.getLeft(), value);
+            return this->insert(node.getLeft(), value);
         else 
         {
             node.setLeft(new Node(value));
             return true;
         }
     }
-    else if(value > node.getData())
+    else if(getKey(value) > getKey(data))
     {
         if(node.hasRightChild())
-            return this->add(node.getRight(), value);
+            return this->insert(node.getRight(), value);
         else 
         {
             node.setRight(new Node(value));
@@ -208,8 +195,8 @@ bool BinaryTree<T>::add(Node &node, T value)
         return false;
 }
 
-template <typename T>
-void BinaryTree<T>::add(T value)
+template <typename ObjectT, typename KeyT>
+void BinaryTree<ObjectT, KeyT>::insert(ObjectT value)
 {
     bool is_new;
     if(isEmpty())
@@ -218,29 +205,31 @@ void BinaryTree<T>::add(T value)
         is_new = true;
     }
     else {
-        is_new = this->add(this->getRoot(), value);
+        is_new = this->insert(this->getRoot(), value);
     }
     if(is_new)
         this->size++;
 }
 
-template <typename T>
-typename BinaryTree<T>::Node *BinaryTree<T>::remove(Node &node, T value)
+template <typename ObjectT, typename KeyT>
+typename BinaryTree<ObjectT, KeyT>::Node *BinaryTree<ObjectT, KeyT>::remove(Node &node, ObjectT value)
 {
     // std::cout << "Node " << node.getData() << std::endl;
 
     // if(node.hasRightChild())
     //     std::cout << "right " << node.getRight().getData() << std::endl;
 
-    if(node.getData() != value)
+    ObjectT data = node.getData();
+
+    if(getKey(data) != getKey(value))
     {
-        if(value < node.getData() && node.hasLeftChild())
+        if(getKey(value) < getKey(data) && node.hasLeftChild())
         {
             node.setLeft(remove(node.getLeft(), value));
             
             return &node;
         }
-        else if(value > node.getData() && node.hasRightChild())
+        else if(getKey(value) > getKey(data) && node.hasRightChild())
         {
             node.setRight(remove(node.getRight(), value));
 
@@ -295,16 +284,16 @@ typename BinaryTree<T>::Node *BinaryTree<T>::remove(Node &node, T value)
     return &node;
 }
 
-template <typename T>
-void BinaryTree<T>::remove(T value)
+template <typename ObjectT, typename KeyT>
+void BinaryTree<ObjectT, KeyT>::remove(ObjectT value)
 {
     this->root = remove(getRoot(), value);
 }
 
-template <typename T>
-std::vector<T> BinaryTree<T>::getInOrderTraversal()
+template <typename ObjectT, typename KeyT>
+std::vector<ObjectT> BinaryTree<ObjectT, KeyT>::getInOrderTraversal()
 {
-    std::vector<T> res_vector;
+    std::vector<ObjectT> res_vector;
     res_vector.reserve(this->getSize());
 
     std::function<void(Node &)> func;

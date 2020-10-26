@@ -1,15 +1,31 @@
 #include <iostream>
-#include "Heap.h"
+#include "BinaryTree.h"
+
+struct Person
+{
+    unsigned int age;
+    std::string name;
+
+    Person(std::string name, unsigned int age): name(name), age(age){};
+
+    bool operator==(const Person &person){return this->age == person.age && this->name == person.name;}
+};
 
 int main()
 {
-    Heap<int> heap;
+    BinaryTree<Person, int> tree([](Person &person){return person.age;});
 
-    heap.insert(1);
-    heap.insert(2);
-    heap.insert(59);
+    tree.insert(Person("Ivan", 17));
+    tree.insert(Person("Grisha", 25));
+    tree.insert(Person("Vova", 65));
 
-    std::cout << heap.poll() << ' ' << heap.poll() << ' ' << heap.poll() << std::endl;
+    for(auto &i: tree.getInOrderTraversal())
+        std::cout << i.name << ' ' << i.age << std::endl;
+
+    tree.remove(Person("Ivan", 17));
+
+    for(auto &i: tree.getInOrderTraversal())
+        std::cout << i.name << ' ' << i.age << std::endl;
 
     return 0;
 }
